@@ -9,6 +9,5 @@ toml = "0.4.5"
 
 [dependencies.librespot]
 git = "https://github.com/plietar/librespot"
-
-[features]
-pulseaudio-backend = ["librespot/pulseaudio-backend"]
+default-features = false
+features = ["alsa-backend"]
