@@ -12,7 +12,7 @@ use toml::Value;
 
 use librespot::core::authentication::Credentials;
 use librespot::core::config::{PlayerConfig, SessionConfig};
-use librespot::metadata::{Metadata, Track};
+use librespot::metadata::{Metadata, Track}; //Unused
 use librespot::core::session::Session;
 use librespot::core::util::SpotifyId;
 
@@ -20,10 +20,13 @@ use librespot::audio_backend;
 use librespot::player::Player;
 
 fn main() {
+    //TODO(cfg) let the user pass in the config file
     let filename = "songs.toml";
+    //QUESTION: This looks like a callback structure, is that correct?
     let mut core = Core::new().unwrap();
     let handle = core.handle();
 
+    //TODO(sptfy-setup) blackbox spotify setup and config
     let session_config = SessionConfig::default();
     let player_config = PlayerConfig::default();
 
@@ -33,18 +36,24 @@ fn main() {
     }
     let username = args[1].to_owned();
     let password = args[2].to_owned();
+    //TODO(tkn) can we use a token instead?
     let credentials = Credentials::with_password(username, password);
 
 
-    let backend = audio_backend::find(Some("pulseaudio".to_owned())).unwrap();
+    //let backend = audio_backend::find(Some("pulseaudio".to_owned())).unwrap();
+    let backend = audio_backend::find(None).unwrap();
 
     println!("Connecting ..");
     let session = core.run(Session::connect(session_config, credentials, None, handle))
         .unwrap();
+
     /*
+    //TODO(trk-name) log info about tracks being played
     let trackmeta = core.run(Track::get(&session.to_owned(), track)).unwrap();
     println!("Track info : {}", trackmeta.name);
     */
+
+    //TODO(sptfy-setup) this could be the return value for blackbox
     let player = Player::new(player_config,
                              session.clone(),
                              None,
@@ -71,12 +80,12 @@ fn main() {
                 match songs[input.trim()].as_str() {
                     Some(trackstr) => {
                         let track = SpotifyId::from_base62(trackstr);
-                        println!("{} bytes read", n);
                         println!("Playing...");
 
+                        //TODO(interupt) add the ability to interupt player
                         core.run(player.load(track, true, 0)).unwrap();
 
-                        println!("Done");
+                        println!("Ready for scanning.");
                     }
                     None => println!("error: {} not found", input.trim()),
                 }
